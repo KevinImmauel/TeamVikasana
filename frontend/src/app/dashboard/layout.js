@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
+import Sidebar from '../../components/Sidebar';
+import Navbar from '../../components/Navbar';
 import { useTheme } from '../context/ThemeContext';
 import { ToastProvider } from '../context/ToastContext';
-import Toast from '../components/Toast';
-import ErrorBoundary from '../components/ErrorBoundary';
+import Toast from '../../components/Toast';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 export default function DashboardLayout({ children }) {
   const { isDark } = useTheme();

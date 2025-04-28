@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import beatsService from "../services/beats";
 import incidentsService from "../services/incidents";
 import sosService from "../services/sos";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function Dashboard() {
   const { user, hasRole } = useAuth();

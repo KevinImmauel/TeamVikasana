@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import beatsService from "../../services/beats";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import BeatModal from "../../components/BeatModal";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import BeatModal from "../../../components/BeatModal";
 
 export default function BeatsManagement() {
   const { hasRole } = useAuth();

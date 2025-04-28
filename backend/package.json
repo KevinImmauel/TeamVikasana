@@ -29,8 +29,10 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
+    "socket.io": "^4.8.1",
     "urlhortbackend": "file:",
     "winston": "^3.13.0",
-    "winston-mongodb": "^6.0.0"
+    "winston-mongodb": "^6.0.0",
+    "ws": "^8.18.1"
   }
 }

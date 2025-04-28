@@ -4,7 +4,9 @@ const app = require('./app')
 const {logger} = require("./util/logger")
 const { connectToDatabases } = require('./database/db')
 const server = http.createServer(app)
-
+const  setupSocket  = require('./websocket/websocket'); // Import WebSocket server
+// initializeSOSSocket(server);
+setupSocket(server);
 
 
 const PORT = configData.PORT || process.env.PORT

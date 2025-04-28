@@ -10,7 +10,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import incidentsService from "../../services/incidents";
 import beatsService from "../../services/beats";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../../components/LoadingSpinner";
 
 export default function AnalyticsPage() {
   const { hasRole } = useAuth();
