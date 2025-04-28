@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const {getMainDb} = require('../database/db');
+const {Schema} = mongoose
 
-const SOSScehma = new mongoose.Schema({
+const SOSScehma = new Schema({
   triggered_by: String,
   station_id: String,
   location: {
@@ -13,4 +15,4 @@ const SOSScehma = new mongoose.Schema({
   responded_by: String
 }, { timestamps: true });
 
-module.exports = mongoose.model('SOS', SOSScehma);
+module.exports = getMainDb().model('SOS', SOSScehma);

@@ -1,14 +1,16 @@
-const mongoose = require('../database/db');
+const mongoose = require('mongoose');
+const {getMainDb} = require('../database/db');
+const {Schema} = mongoose
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   name: String,
   email: { type: String, unique: true },
   phone: String,
   password: String,
-  role: { type: String, enum: ['SuperAdmin', 'SP', 'DSP', 'CI', 'SHO', 'SI', 'ASI', 'Constable', 'ControlRoom'] },
+  role: { type: String, enum: ['SUPERADMIN', 'SP', 'DSP', 'CI', 'SHO', 'SI', 'ASI', 'CONSTABLE', 'CONTROLROOM'] },
   station_id: String,
   circle: String,
   district: String
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = getMainDb().model('User', UserSchema);

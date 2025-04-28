@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const {getMainDb} = require('../database/db');
+const {Schema} = mongoose
 
-const BeatSchema = new mongoose.Schema({
+const BeatSchema = new Schema({
   station_id: String,
   beat_id: String,
   assigned_to: String, // user_id of constable
@@ -13,4 +15,4 @@ const BeatSchema = new mongoose.Schema({
   status: { type: String, default: 'Assigned' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Beat', BeatSchema);
+module.exports = getMainDb().model('Beat', BeatSchema);

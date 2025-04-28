@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const {getMainDb} = require('../database/db');
+const {Schema} = mongoose
 
-const IncidentSchema = new mongoose.Schema({
+const IncidentSchema = new Schema({
   beat_id: String,
   reported_by: String,
   station_id: String,
@@ -15,4 +17,4 @@ const IncidentSchema = new mongoose.Schema({
   status: { type: String, default: 'Pending Review' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Incident', IncidentSchema);
+module.exports = getMainDb().model('Incident', IncidentSchema);

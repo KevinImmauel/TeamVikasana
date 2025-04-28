@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken')
+const { JWT_SECRET } = require('../config/config');
+ 
 
 // Environment variables for JWT
-const JWT_SECRET = process.env.JWT_SECRET || '123456789' 
+// const JWT_SECRET = process.env.JWT_SECRET || '123456789' 
 const JWT_EXPIRATION = '1h' 
 
 /**

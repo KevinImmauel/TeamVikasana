@@ -1,5 +1,5 @@
 // src/config/db.js
-const mongoose = require('mongoose')
+const {mongoose} = require('mongoose')
 const config = require('../config/config')
 const logger = require('../util/logger')
 
