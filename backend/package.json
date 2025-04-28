@@ -1,0 +1,37 @@
+{
+  "name": "urlhortbackend",
+  "version": "1.0.0",
+  "description": "Backend for Centralized Standard Beat Management Solution",
+  "main": "./src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon  ./src/server.js",
+    "start": "cross-env NODE_ENV=production node ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+
+  },
+  "author": "gaurav kesh roushan",
+  "license": "ISC",
+  
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.5.0",
+    "globals": "^15.11.0",
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "dotenv-flow": "^4.1.0",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.3",
+    "winston": "^3.13.0",
+    "winston-mongodb": "^6.0.0"
+  }
+}
