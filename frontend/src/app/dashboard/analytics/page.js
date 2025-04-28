@@ -8,8 +8,6 @@ import {
   Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { useAuth } from "../../context/AuthContext";
-import incidentsService from "../../services/incidents";
-import beatsService from "../../services/beats";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
 export default function AnalyticsPage() {
@@ -19,7 +17,6 @@ export default function AnalyticsPage() {
   const [incidentsByBeat, setIncidentsByBeat] = useState([]);
   const [incidentsByType, setIncidentsByType] = useState([]);
 
-  // Colors for pie chart that work in both light & dark modes
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
   useEffect(() => {
@@ -55,8 +52,6 @@ export default function AnalyticsPage() {
 
   // Process incidents by beat for the bar chart
   const processIncidentsByBeat = (incidents = [], beats = []) => {
-    // Since we don't have actual data, we'll create sample data
-    // In a real app, you would process the actual incidents & beats data
     
     // Mock data for demo - replace with real data processing
     return [

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTheme } from '../app/context/ThemeContext';
 
 // Icons
 const DashboardIcon = () => (
@@ -59,7 +58,7 @@ const navigationItems = [
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { isDark } = useTheme();
+  const { isDark } = false;
   
   // Close sidebar on route change on mobile
   useEffect(() => {
@@ -124,23 +123,23 @@ export default function Sidebar() {
           <nav className="flex-grow py-4 px-2 overflow-y-auto">
             <ul className="space-y-1">
               {navigationItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                
+                const isActive = pathname === item.href;
+
                 return (
                   <li key={item.name}>
                     <Link
                       href={item.href}
                       className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200
-                                ${isActive 
-                                  ? 'bg-primary-500 text-white' 
-                                  : `hover:bg-opacity-10 ${isDark ? 'hover:bg-white' : 'hover:bg-gray-900'}`
-                                }`}
+                  ${isActive
+                          ? 'bg-primary-500 text-white'
+                          : `hover:bg-opacity-10 ${isDark ? 'hover:bg-white' : 'hover:bg-gray-900'}`
+                        }`}
                     >
                       <span className="flex-shrink-0">
                         <item.icon />
                       </span>
                       <span>{item.name}</span>
-                      
+
                       {/* Active indicator */}
                       {isActive && (
                         <span className="ml-auto h-2 w-2 rounded-full bg-white"></span>
@@ -149,6 +148,7 @@ export default function Sidebar() {
                   </li>
                 );
               })}
+
             </ul>
           </nav>
           

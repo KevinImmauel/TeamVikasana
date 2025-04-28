@@ -3,11 +3,8 @@
 import { useEffect } from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { useRouter } from 'next/navigation';
-import { useToast } from '../app/context/ToastContext';
 
-/**
- * Generic fallback component that displays when an error occurs
- */
+
 function ErrorFallback({ error, resetErrorBoundary }) {
   const router = useRouter();
 
@@ -39,25 +36,16 @@ function ErrorFallback({ error, resetErrorBoundary }) {
   );
 }
 
-/**
- * Error logging function
- */
+
 function logErrorToService(error, info) {
-  // In a real app, you'd send this to your error tracking service
   console.error('Error caught by ErrorBoundary:', error);
   console.error('Component stack:', info?.componentStack || 'No component stack available');
 }
 
-/**
- * Main ErrorBoundary component that wraps the application
- */
 export default function AppErrorBoundary({ children }) {
-  const { showToast } = useToast();
-  
-  // Optional: Show a toast when error is caught
+
   const onError = (error, info) => {
     logErrorToService(error, info);
-    showToast('An unexpected error occurred', 'error');
   };
   
   return (
@@ -65,7 +53,7 @@ export default function AppErrorBoundary({ children }) {
       FallbackComponent={ErrorFallback}
       onError={onError}
       onReset={() => {
-        // Optional: Reset any state here if needed
+
       }}
     >
       {children}

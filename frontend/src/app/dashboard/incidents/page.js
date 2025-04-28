@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import incidentsService from "../../services/incidents";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
 export default function IncidentsManagement() {

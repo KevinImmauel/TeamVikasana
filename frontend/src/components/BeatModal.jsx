@@ -2,17 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-/**
- * Modal component for creating and editing beat information
- * @param {Object} props - Component props
- * @param {boolean} props.isOpen - Whether the modal is open
- * @param {Function} props.onClose - Function to call when modal is closed
- * @param {Function} props.onSubmit - Function to call when form is submitted
- * @param {Object} props.initialData - Initial data for editing mode
- * @param {Array} props.constables - List of constables for assignment
- * @param {boolean} props.isLoading - Whether a submission is in progress
- * @returns {JSX.Element | null} - The BeatModal component or null if not open
- */
 export default function BeatModal({ 
   isOpen, 
   onClose, 
@@ -31,7 +20,6 @@ export default function BeatModal({
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   
-  // Initialize form data when modal opens or initialData changes
   useEffect(() => {
     if (initialData) {
       setFormData({

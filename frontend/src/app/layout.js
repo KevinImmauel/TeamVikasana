@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
-import { ToastProvider } from "./context/ToastContext";
 import AppErrorBoundary from "../components/ErrorBoundary";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -27,12 +26,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <ToastProvider>
             <AppErrorBoundary>
             <Navbar/>
               {children}
             </AppErrorBoundary>
-          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

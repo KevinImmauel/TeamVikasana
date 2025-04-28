@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
-import beatsService from "../services/beats";
-import incidentsService from "../services/incidents";
-import sosService from "../services/sos";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function Dashboard() {
@@ -21,16 +18,12 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        // Fetch data based on user role
         const promises = [];
         
-        // All roles need active beats count
         promises.push(beatsService.getActiveBeats());
         
-        // All roles need recent incidents
         promises.push(incidentsService.getRecentIncidents(5));
         
-        // All roles need active SOS alerts
         promises.push(sosService.getActiveAlerts());
 
         const [beatsData, incidentsData, sosData] = await Promise.all(promises);
