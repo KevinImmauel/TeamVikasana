@@ -8,11 +8,9 @@
     "dev": "cross-env NODE_ENV=development nodemon  ./src/server.js",
     "start": "cross-env NODE_ENV=production node ./src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-
   },
   "author": "gaurav kesh roushan",
   "license": "ISC",
-  
   "devDependencies": {
     "@commitlint/config-conventional": "^19.5.0",
     "globals": "^15.11.0",
@@ -31,6 +29,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
+    "urlhortbackend": "file:",
     "winston": "^3.13.0",
     "winston-mongodb": "^6.0.0"
   }
