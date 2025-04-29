@@ -60,15 +60,48 @@ const SOSPage = () => {
         }
     };
 
-    const sendSOS = () => {
+
+    const getUserLocation = () => {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error("Geolocation is not supported by your browser."));
+            } else {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        });
+                    },
+                    (error) => {
+                        reject(new Error(`Geolocation error: ${error.message}`));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0,
+                    }
+                );
+            }
+        });
+    };
+
+
+
+    const sendSOS = async() => {
         if (socket && socket.connected) {
+            const location = await getUserLocation();
+            console.log(location);
             const sosData = {
                 triggered_by: "User1",
                 station_id: "Station1",
-                location: {
-                    latitude: 12.9716,
-                    longitude: 77.5946,
-                },
+                location,
+                // : {
+
+
+                //     latitude: 12.9716,
+                //     longitude: 77.5946,
+                // },
                 emergency_type: message || "Medical",
             };
 
@@ -97,7 +130,22 @@ const SOSPage = () => {
         <div className="p-4 border rounded-xl shadow-lg bg-white hover:shadow-2xl transition-all duration-300">
             <p><strong>🚨 Triggered By:</strong> {sos?.triggered_by}</p>
             <p><strong>🏢 Station:</strong> {sos?.station_id}</p>
-            <p><strong>📍 Location:</strong> ({sos?.location?.latitude}, {sos?.location?.longitude})</p>
+            <p>
+                <strong>📍 Location:</strong>{' '}
+                {sos?.location?.latitude && sos?.location?.longitude ? (
+                    <a
+                        href={`https://www.google.com/maps?q=${sos.location.latitude},${sos.location.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
+                    >
+                        ({sos.location.latitude}, {sos.location.longitude})
+                    </a>
+                ) : (
+                    'Location not available'
+                )}
+            </p>
+
             <p><strong>🆘 Emergency Type:</strong> {sos?.emergency_type}</p>
             <p><strong>⏰ Timestamp:</strong> {new Date(sos?.createdAt || sos?.timestamp).toLocaleString()}</p>
         </div>

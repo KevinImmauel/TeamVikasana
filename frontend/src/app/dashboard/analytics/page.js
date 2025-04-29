@@ -23,21 +23,34 @@ export default function AnalyticsPage() {
     async function fetchAnalyticsData() {
       try {
         setLoading(true);
-        
-        // Fetch incidents & beats data
-        const [incidentsData, beatsData] = await Promise.all([
-          incidentsService.getAllIncidents(),
-          beatsService.getAllBeats()
-        ]);
-        
-        // Process data for incidents by beat
+
+        // Static mock data
+        const incidentsData = [
+          { id: 1, type: 'Theft', beatId: 'Beat-001' },
+          { id: 2, type: 'Assault', beatId: 'Beat-002' },
+          { id: 3, type: 'Theft', beatId: 'Beat-003' },
+          { id: 4, type: 'Burglary', beatId: 'Beat-001' },
+          { id: 5, type: 'Disturbance', beatId: 'Beat-004' },
+          { id: 6, type: 'Traffic', beatId: 'Beat-005' },
+          { id: 7, type: 'Assault', beatId: 'Beat-006' },
+          // Add more incidents if needed
+        ];
+
+        const beatsData = [
+          { id: 'Beat-001', name: 'Beat-001' },
+          { id: 'Beat-002', name: 'Beat-002' },
+          { id: 'Beat-003', name: 'Beat-003' },
+          { id: 'Beat-004', name: 'Beat-004' },
+          { id: 'Beat-005', name: 'Beat-005' },
+          { id: 'Beat-006', name: 'Beat-006' },
+        ];
+
         const beatIncidents = processIncidentsByBeat(incidentsData, beatsData);
         setIncidentsByBeat(beatIncidents);
-        
-        // Process data for incidents by type
+
         const typeIncidents = processIncidentsByType(incidentsData);
         setIncidentsByType(typeIncidents);
-        
+
         setError(null);
       } catch (error) {
         console.error("Error fetching analytics data:", error);
@@ -46,9 +59,10 @@ export default function AnalyticsPage() {
         setLoading(false);
       }
     }
-    
+
     fetchAnalyticsData();
   }, []);
+
 
   // Process incidents by beat for the bar chart
   const processIncidentsByBeat = (incidents = [], beats = []) => {
@@ -114,7 +128,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-10">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold">Crime Analytics Dashboard</h1>

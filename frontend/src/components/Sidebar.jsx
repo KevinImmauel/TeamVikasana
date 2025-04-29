@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from "../app/context/AuthContext";
 
 // Icons
 const DashboardIcon = () => (
@@ -59,7 +60,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { isDark } = false;
-  
+    const { user, hasRole, logout } = useAuth();
   // Close sidebar on route change on mobile
   useEffect(() => {
     setIsOpen(false);
@@ -151,6 +152,21 @@ export default function Sidebar() {
 
             </ul>
           </nav>
+
+          {/* Logout Button */}
+          <div className="px-4 py-3">
+            <button
+              onClick={() => {
+                // TODO: Handle actual logout logic (e.g., clear auth tokens, redirect)
+                logout();
+                console.log('Logging out...');
+              }}
+              className="w-full flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+            >
+              <span>Logout</span>
+            </button>
+          </div>
+
           
           {/* Footer */}
           <div className={`p-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>

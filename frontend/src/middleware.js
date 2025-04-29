@@ -4,13 +4,13 @@ export function middleware(req) {
     const token = req.cookies.get('token')?.value || null;
     const { pathname } = req.nextUrl;
 
-    const publicPaths = ['/', '/login', '/signup'];
+    const publicPaths = ['/', '/auth/login', '/signup'];
 
     if (!token && !publicPaths.includes(pathname)) {
-        return NextResponse.redirect(new URL('/login', req.url));
+        return NextResponse.redirect(new URL('/auth/login', req.url));
     }
 
-    if (token && (pathname === '/login' || pathname === '/signup')) {
+    if (token && (pathname === '/auth/login' || pathname === '/signup')) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 

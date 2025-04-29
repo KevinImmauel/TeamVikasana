@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import sessionManager from "../lib/utils/sessionManager";
+import Cookies from "js-cookie";
 
 const AuthContext = createContext({});
 
@@ -51,6 +52,7 @@ export function AuthProvider({ children }) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    Cookies.remove('token')
     sessionManager.clearToken();
     setUser(null);
   };
