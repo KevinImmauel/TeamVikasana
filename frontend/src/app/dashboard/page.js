@@ -1,15 +1,15 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
-import beatsService from "../services/beats";
-import incidentsService from "../services/incidents";
-import sosService from "../services/sos";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+import api from "@/utils/axiosInstance";
 
 export default function Dashboard() {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, logout } = useAuth();
   const [stats, setStats] = useState({
     activeBeats: 0,
     incidents: 0,
@@ -19,40 +19,31 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    async function fetchDashboardData() {
+    // Fetch data from API
+    const fetchStats = async () => {
       try {
-        // Fetch data based on user role
-        const promises = [];
-        
-        // All roles need active beats count
-        promises.push(beatsService.getActiveBeats());
-        
-        // All roles need recent incidents
-        promises.push(incidentsService.getRecentIncidents(5));
-        
-        // All roles need active SOS alerts
-        promises.push(sosService.getActiveAlerts());
-
-        const [beatsData, incidentsData, sosData] = await Promise.all(promises);
-
+        const response = await api.get("/stats/counts");
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch stats");
+        // }
+        const data = response.data
         setStats({
-          activeBeats: beatsData.length || 0,
-          incidents: incidentsData.length || 0,
-          sosAlerts: sosData.length || 0,
+          activeBeats: data.beatsCount,
+          incidents: data.incidentsCount,
+          sosAlerts: data.sosCount,
           loading: false,
-          error: null
+          error: null,
         });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
         setStats({
           ...stats,
           loading: false,
-          error: "Failed to load dashboard data"
+          error: error.message,
         });
       }
-    }
+    };
 
-    fetchDashboardData();
+    fetchStats();
   }, []);
 
   // Role-specific welcome message
@@ -82,7 +73,7 @@ export default function Dashboard() {
       <div className="bg-destructive/10 border border-destructive p-6 rounded-lg">
         <h2 className="text-lg font-medium text-destructive mb-2">Error</h2>
         <p>{stats.error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-4 btn-secondary"
         >
@@ -93,13 +84,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-10 py-5">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground mt-1">{getWelcomeMessage()}</p>
         </div>
-        
+
         {/* Quick actions section based on user role */}
         <div className="mt-4 md:mt-0 space-x-2">
           {(hasRole("SuperAdmin") || hasRole("SHO") || hasRole("DSP")) && (
@@ -107,15 +98,15 @@ export default function Dashboard() {
               Assign Beat
             </Link>
           )}
-          
+
           {hasRole("Constable") && (
             <Link href="/dashboard/report-incident" className="btn-primary">
               Report Incident
             </Link>
           )}
-          
-          <Link 
-            href={hasRole("Constable") ? "/dashboard/sos-trigger" : "/dashboard/sos"} 
+
+          <Link
+            href={hasRole("Constable") ? "/dashboard/sos-trigger" : "/dashboard/sos"}
             className={`${hasRole("Constable") ? "btn-destructive" : "btn-secondary"}`}
           >
             {hasRole("Constable") ? "SOS Emergency" : "View SOS Alerts"}
@@ -144,7 +135,7 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-        
+
         {/* Reported Incidents Card */}
         <div className="card">
           <div className="flex justify-between items-start">
@@ -164,7 +155,7 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-        
+
         {/* SOS Alerts Card */}
         <div className="card">
           <div className="flex justify-between items-start">
@@ -200,49 +191,35 @@ export default function Dashboard() {
               <p className="text-2xl font-bold">--%</p>
             </div>
             <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">Response Time</p>
-              <p className="text-2xl font-bold">-- min</p>
+              <p className="text-sm text-muted-foreground">Average Response Time</p>
+              <p className="text-2xl font-bold">--</p>
             </div>
             <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">System Status</p>
-              <p className="text-2xl font-bold text-green-500">Active</p>
+              <p className="text-sm text-muted-foreground">Pending Incidents</p>
+              <p className="text-2xl font-bold">--</p>
             </div>
           </div>
         </div>
       )}
-      
-      {/* Constable-specific section */}
-      {hasRole("Constable") && (
-        <div className="card">
-          <h3 className="text-lg font-medium mb-4">Your Beat Status</h3>
-          <div className="space-y-4">
-            <div className="flex items-center p-4 bg-secondary rounded-lg">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-              <div>
-                <p className="font-medium">Current Assignment</p>
-                <p className="text-sm text-muted-foreground">Beat #12345 - Downtown Area</p>
-              </div>
-              <div className="ml-auto">
-                <p className="text-sm text-muted-foreground">Until 8:00 PM</p>
-              </div>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg">
-              <p className="font-medium mb-2">Recent Activity</p>
-              <div className="text-sm space-y-2">
-                <p className="text-muted-foreground">No recent activity recorded</p>
-              </div>
-            </div>
-            <div className="flex justify-center">
-              <Link href="/dashboard/report-incident" className="btn-primary">
-                Report Incident
-              </Link>
-              <Link href="/dashboard/sos-trigger" className="btn-destructive ml-3">
-                SOS Emergency
-              </Link>
-            </div>
-          </div>
+
+      {/* Stats Chart */}
+      <div className="card mt-8">
+        <h3 className="text-lg font-medium">Beat Incidents & SOS Activity</h3>
+        <div className="mt-6 w-full h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={[
+              { name: 'Active Beats', value: stats.activeBeats },
+              { name: 'Reported Incidents', value: stats.incidents },
+              { name: 'SOS Alerts', value: stats.sosAlerts }
+            ]}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      )}
+      </div>
     </div>
   );
 }

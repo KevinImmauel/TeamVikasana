@@ -1,7 +1,7 @@
 export default function AuthLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="">
         {children}
       </div>
       <footer className="bg-secondary border-t border-border">

@@ -9,16 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.2",
     "axios": "^1.9.0",
+    "framer-motion": "^12.9.2",
     "frontend": "file:",
+    "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.503.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
-    "react-leaflet": "^5.0.0",
     "recharts": "^2.15.3"
   },
   "devDependencies": {

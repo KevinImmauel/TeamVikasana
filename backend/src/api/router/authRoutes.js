@@ -1,7 +1,7 @@
 const express = require('express');
 const { login, signup } = require('../controller/authController');
 const rbacMiddleware = require('../../service/validation/rbacMiddleware'); // JWT token checker
-const { superAdminMiddleware } = require('../../service/roleBasedAccess');
+const { adminMiddleware } = require('../../service/roleBasedAccess');
 const apiValidator = require('../../service/validation/apiValidation');
 const router = express.Router();
 
@@ -9,6 +9,6 @@ const router = express.Router();
 router.post('/auth/login', login);
 
 // Signup Route
-router.post('/auth/signup', apiValidator, superAdminMiddleware, signup);
+router.post('/auth/signup', apiValidator, adminMiddleware, signup);
 
 module.exports = router;
