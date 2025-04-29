@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import Messages from '../../components/Messages';
-import ChatInput from '../../components/ChatInput';
+import Messages from '@/components/Messages';
+import ChatInput from '@/components/ChatInput';
+import api from '@/utils/axiosInstance';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([
@@ -22,7 +23,7 @@ export default function ChatPage() {
     });
 
     try {
-      const res = await axios.post('http://localhost:5000/chat', { message: text });
+      const res = await api.post('/chat', { message: text });
       const botReply = { sender: 'bot', text: res.data.reply || res.data.response
       };
       setMessages((prev) => {

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { chatWithGemini } = require('./gemini');
+const { chatWithGemini } = require('../backend/src/chatbot/gemini');
 const { getData } = require('./fetchData');
 
 const app = express();
@@ -10,7 +10,7 @@ const port = 5000;
 app.use(cors());
 app.use(express.json());
 
-const cachedData = getData();  // fetch once at server start
+const cachedData = getData(); 
 
 app.get('/', (req, res) => {
   res.send('Chatbot Server Running');

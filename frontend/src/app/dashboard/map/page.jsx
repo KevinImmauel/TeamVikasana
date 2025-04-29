@@ -1,7 +1,7 @@
 // src/app/page.jsx
 "use client";
 
-import AlertMap from '../../components/AlertMap';
+import AlertMap from '@/components/AlertMap';
 
 export default function MapPage() {
   const alertLocations = [

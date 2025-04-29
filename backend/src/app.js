@@ -13,6 +13,7 @@ const sosRoutes = require('./api/router/sosRoutes')
 const beatRoute = require('./api/router/beatRoutes')
 const incidentRoute = require('./api/router/incidentRoutes')
 const statsRoute = require('./api/router/getCount.js')
+const chatBotRoute = require('./chatbot/chatbotRoute.js')
 const apiValidator = require('./service/validation/apiValidation.js')
 
 
@@ -47,6 +48,7 @@ app.use('/api/v1', sosRoutes  )
 app.use('/api/v1/beat', beatRoute   )
 app.use('/api/v1', incidentRoute   )
 app.use('/api/v1', statsRoute   )
+app.use('/api/v1', chatBotRoute   )
 
 // 404 Handler
 app.use((req, _, next) => {

@@ -9,6 +9,7 @@ const config = {
     PORT: process.env.PORT || 3000,
     SERVER_URL: process.env.SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN
     // REDIS_URL: process.env.REDIS_URL,
