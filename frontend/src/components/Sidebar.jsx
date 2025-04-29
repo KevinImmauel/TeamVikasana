@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import { useAuth } from "../app/context/AuthContext";
+import Cookies from 'js-cookie';
 
 // Icons
 const DashboardIcon = () => (
@@ -175,8 +176,10 @@ export default function Sidebar() {
             <button
               onClick={() => {
                 // TODO: Handle actual logout logic (e.g., clear auth tokens, redirect)
-                logout();
+                Cookies.remove('token')
+                Cookies.remove('user')
                 console.log('Logging out...');
+                redirect('/')
               }}
               className="w-full flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-all"
             >
