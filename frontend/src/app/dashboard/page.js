@@ -1,15 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import Cookies from "js-cookie";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts';
 import api from "@/utils/axiosInstance";
 
 export default function Dashboard() {
-  const { user, hasRole, logout } = useAuth();
+  const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
     activeBeats: 0,
     incidents: 0,
@@ -18,15 +18,25 @@ export default function Dashboard() {
     error: null
   });
 
+  // Load user from localStorage or Cookies if not provided
+  useEffect(() => {
+    const storedUser = Cookies.get("user") || localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser)); // Set the state with stored user
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        // Handle the error gracefully, e.g., clear storage or redirect
+      }
+    }
+  }, []);
+
   useEffect(() => {
     // Fetch data from API
     const fetchStats = async () => {
       try {
         const response = await api.get("/stats/counts");
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch stats");
-        // }
-        const data = response.data
+        const data = response.data;
         setStats({
           activeBeats: data.beatsCount,
           incidents: data.incidentsCount,
@@ -48,13 +58,13 @@ export default function Dashboard() {
 
   // Role-specific welcome message
   const getWelcomeMessage = () => {
-    if (hasRole("SuperAdmin")) {
+    if (user?.role === "SuperAdmin") {
       return "Welcome, Admin! Here's an overview of the system.";
-    } else if (hasRole("SHO")) {
+    } else if (user?.role === "SHO") {
       return "Welcome, Station House Officer! Here's your station's status.";
-    } else if (hasRole("DSP")) {
+    } else if (user?.role === "DSP") {
       return "Welcome, Deputy Superintendent! Here's your district's status.";
-    } else if (hasRole("Constable")) {
+    } else if (user?.role === "Constable") {
       return "Welcome, Officer! Here's your beat information.";
     }
     return "Welcome to the Beat Management System!";
@@ -93,23 +103,23 @@ export default function Dashboard() {
 
         {/* Quick actions section based on user role */}
         <div className="mt-4 md:mt-0 space-x-2">
-          {(hasRole("SuperAdmin") || hasRole("SHO") || hasRole("DSP")) && (
+          {(user?.role === "SuperAdmin" || user?.role === "SHO" || user?.role === "DSP") && (
             <Link href="/dashboard/beats" className="btn-primary">
               Assign Beat
             </Link>
           )}
 
-          {hasRole("Constable") && (
+          {user?.role === "Constable" && (
             <Link href="/dashboard/report-incident" className="btn-primary">
               Report Incident
             </Link>
           )}
 
           <Link
-            href={hasRole("Constable") ? "/dashboard/sos-trigger" : "/dashboard/sos"}
-            className={`${hasRole("Constable") ? "btn-destructive" : "btn-secondary"}`}
+            href={user?.role === "Constable" ? "/dashboard/sos-trigger" : "/dashboard/sos"}
+            className={`${user?.role === "Constable" ? "btn-destructive" : "btn-secondary"}`}
           >
-            {hasRole("Constable") ? "SOS Emergency" : "View SOS Alerts"}
+            {user?.role === "Constable" ? "SOS Emergency" : "View SOS Alerts"}
           </Link>
         </div>
       </div>
@@ -130,7 +140,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <Link href={hasRole("Constable") ? "/dashboard/my-beats" : "/dashboard/beats"} className="text-sm text-primary font-medium hover:underline">
+            <Link href={user?.role === "Constable" ? "/dashboard/my-beats" : "/dashboard/beats"} className="text-sm text-primary font-medium hover:underline">
               View details →
             </Link>
           </div>
@@ -150,8 +160,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <Link href={hasRole("Constable") ? "/dashboard/report-incident" : "/dashboard/incidents"} className="text-sm text-primary font-medium hover:underline">
-              {hasRole("Constable") ? "Report new incident" : "View all incidents"} →
+            <Link href={user?.role === "Constable" ? "/dashboard/report-incident" : "/dashboard/incidents"} className="text-sm text-primary font-medium hover:underline">
+              {user?.role === "Constable" ? "Report new incident" : "View all incidents"} →
             </Link>
           </div>
         </div>
@@ -170,37 +180,12 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-4">
-            <Link href={hasRole("Constable") ? "/dashboard/sos-trigger" : "/dashboard/sos"} className="text-sm text-primary font-medium hover:underline">
-              {hasRole("Constable") ? "Trigger SOS" : "View SOS alerts"} →
+            <Link href={user?.role === "Constable" ? "/dashboard/sos-trigger" : "/dashboard/sos"} className="text-sm text-primary font-medium hover:underline">
+              {user?.role === "Constable" ? "Trigger SOS" : "View SOS alerts"} →
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Admin-specific section */}
-      {(hasRole("SuperAdmin") || hasRole("SHO") || hasRole("DSP")) && (
-        <div className="card">
-          <h3 className="text-lg font-medium mb-4">System Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">Total Officers</p>
-              <p className="text-2xl font-bold">--</p>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">Beats Coverage</p>
-              <p className="text-2xl font-bold">--%</p>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">Average Response Time</p>
-              <p className="text-2xl font-bold">--</p>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg">
-              <p className="text-sm text-muted-foreground">Pending Incidents</p>
-              <p className="text-2xl font-bold">--</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Stats Chart */}
       <div className="card mt-8">

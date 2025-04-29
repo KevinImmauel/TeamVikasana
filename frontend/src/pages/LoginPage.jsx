@@ -24,10 +24,12 @@ export default function LoginPage() {
                     headers: { 'Content-Type': 'application/json' },
                 }
             );
-
-            const { token } = data;
+            
+            const { token, userWithoutPassword } = data;
             Cookies.set('token', token, { expires: 7 });
+            Cookies.set('user', userWithoutPassword.role);
             localStorage.setItem('token', token);
+            localStorage.setItem('user', userWithoutPassword.role);
 
             router.push('/dashboard');
         } catch (err) {
