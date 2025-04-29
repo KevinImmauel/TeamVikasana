@@ -48,12 +48,29 @@ const CloseIcon = () => (
   </svg>
 );
 
+const ChatBotIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8C3 4.68629 5.68629 2 9 2C12.3137 2 15 4.68629 15 8C15 9.61314 14.0536 11.0156 12.9326 11.9311C12.3582 12.4289 11.5005 12.6905 10.607 12.6905C9.71347 12.6905 8.85568 12.4289 8.28134 11.9311C7.16033 11.0156 6.214 9.61314 6.214 8C6.214 7.34917 6.46335 6.72129 6.89868 6.27868C7.30784 5.89072 7.80216 5.7468 8.269 5.95768C8.70595 6.15134 9 6.59844 9 7.066V8C9 8.53043 9.21029 9.03914 9.58579 9.41421C10.5876 10.416 12 11 13 11C13.4183 11 13.8169 10.8348 14.1505 10.5305C14.8423 9.82648 15 8.92603 15 8C15 4.68629 12.3137 2 9 2C5.68629 2 3 4.68629 3 8Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 8L9 12L3 8" />
+  </svg>
+);
+
+const MapIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3L12 8L21 3V21L12 16L3 21V3Z" />
+  </svg>
+);
+
+
+
 const navigationItems = [
   { name: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
   { name: 'Beats', href: '/dashboard/beats', icon: BeatsIcon },
   { name: 'Incidents', href: '/dashboard/incidents', icon: IncidentsIcon },
   { name: 'SOS', href: '/dashboard/sos', icon: SOSIcon },
   { name: 'Analytics', href: '/dashboard/analytics', icon: AnalyticsIcon },
+  { name: 'AI Chat Bot', href: '/dashboard/chat', icon: ChatBotIcon },
+  { name: 'Maps', href: '/dashboard/map', icon: MapIcon },
 ];
 
 export default function Sidebar() {

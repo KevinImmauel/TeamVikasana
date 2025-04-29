@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure the map container has proper dimensions */
+.leaflet-container {
+  margin-top: 8rem;
+  height: 80%;
+  width: 80%;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;

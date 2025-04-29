@@ -27,6 +27,8 @@ export default function Navbar() {
     { name: 'Incidents', href: '/dashboard/incidents' },
     { name: 'SOS', href: '/dashboard/sos' },
     { name: 'Analytics', href: '/dashboard/analytics' },
+    { name: 'AI Chat Bot', href: '/dashboard/chat' },
+    { name: 'Maps', href: '/dashboard/map' },
   ];
 
   return (
