@@ -36,13 +36,14 @@ const UserSchema = new Schema({
     required: true,
   },
 }, {
-  timestamps: true,  // Automatically adds createdAt and updatedAt fields
+  timestamps: true,  
 });
 
 UserSchema.methods.toJSON = function () {
   const user = this.toObject();
-  delete user.password;  // Remove password from the output
+  delete user.password;
   return user;
 };
+
 
 module.exports = getMainDb().model('User', UserSchema);

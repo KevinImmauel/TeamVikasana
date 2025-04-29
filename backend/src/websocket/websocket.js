@@ -6,6 +6,8 @@ const apiValidator = require('../service/validation/apiValidation');
 const express = require('express');
 const {JWT_SECRET} = require('../config/config');
 const logger = require('../util/logger');
+const user = require('../model/userModel');
+const { logCrimeLocationAsync } = require('../util/logCrimeLocation');
 const app = express()
 app.use(apiValidator)
 const userConnections = new Map();
@@ -33,9 +35,19 @@ const setupSocket = (server) => {
 
                 // Save SOS data to MongoDB
                 const sosMessage = new SOS(sosData);
+                const getStation = await user.findOne({ _id: userId });
+                if (getStation && getStation.station_id) {
+                    sosData.station_id = getStation.station_id;
+                }
+
                 await sosMessage.save(); 
 
                 console.log('SOS saved to database:', sosMessage);
+                logCrimeLocationAsync({
+                    location:sosData.location,
+                    seriousness:"HIGH",
+                    station_id: getStation.station_id
+                })
                 userConnections.forEach((user) => {
                     user.socket.emit('newSOS', sosMessage);
                 });

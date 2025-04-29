@@ -1,4 +1,5 @@
 const sosModel = require('../../model/sosModel');
+const { logCrimeLocationAsync } = require('../../util/logCrimeLocation');
 
 exports.triggerSOS = async (req, res) => {
   const { location, emergency_type } = req.body;
@@ -10,6 +11,12 @@ exports.triggerSOS = async (req, res) => {
     timestamp: new Date()
   });
   await sos.save();
+  logCrimeLocationAsync({
+    location,
+    station_id: req.user.station_id,
+
+
+  })
   res.json({ message: 'SOS triggered!', sos });
 };
 
@@ -27,7 +34,7 @@ exports.storedSOS = async (req, res) => {
 
 
 
-  exports.getActiveSOS = async (req, res) => {
-    const sos = await sosModel.find({ station_id: req.user.station_id, status: 'Active' });
-    res.json(sos);
-  };
+exports.getActiveSOS = async (req, res) => {
+  const sos = await sosModel.find({ station_id: req.user.station_id, status: 'Active' });
+  res.json(sos);
+};
