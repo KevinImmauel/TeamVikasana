@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import PageTransition from '../components/PageTransition';
 import { useTheme } from '../context/ThemeContext';
 import { ToastProvider } from '../context/ToastContext';
-import Toast from '../components/Toast';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function DashboardLayout({ children }) {
@@ -23,32 +23,33 @@ export default function DashboardLayout({ children }) {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <div className={`flex h-screen ${isDark ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className="flex min-h-screen bg-gray-50 dark:bg-dark-400 transition-colors duration-300">
           {/* Sidebar */}
           <Sidebar />
           
           {/* Main content */}
-          <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex flex-col flex-1 w-full overflow-hidden">
             {/* Top navigation */}
             <Navbar />
             
-            {/* Page content */}
-            <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-              <div className="container mx-auto">
-                {children}
+            {/* Page content with transitions */}
+            <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 bg-gray-50 dark:bg-dark-400 transition-colors duration-300">
+              <div className="max-w-7xl mx-auto">
+                <PageTransition>
+                  {children}
+                </PageTransition>
               </div>
             </main>
             
             {/* Footer */}
-            <footer className={`py-4 px-6 ${isDark ? 'bg-gray-800' : 'bg-white'} border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-              <div className="container mx-auto text-center text-sm opacity-70">
-                <p>Team Vikasana - Police Beat Management System</p>
+            <footer className="bg-white dark:bg-dark-500 border-t border-gray-200 dark:border-gray-700 py-4 px-6 transition-colors duration-300">
+              <div className="max-w-7xl mx-auto text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Police Department Dashboard — Team Vikasana © {new Date().getFullYear()}
+                </p>
               </div>
             </footer>
           </div>
-          
-          {/* Toast notifications */}
-          <Toast />
         </div>
       </ToastProvider>
     </ErrorBoundary>

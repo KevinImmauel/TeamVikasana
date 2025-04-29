@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { 
   BarChart, Bar, 
   PieChart, Pie, Cell,
@@ -11,6 +12,7 @@ import { useAuth } from "../../context/AuthContext";
 import incidentsService from "../../services/incidents";
 import beatsService from "../../services/beats";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { containerVariants, itemVariants } from "../../components/PageTransition";
 
 export default function AnalyticsPage() {
   const { hasRole } = useAuth();
@@ -25,27 +27,24 @@ export default function AnalyticsPage() {
   useEffect(() => {
     async function fetchAnalyticsData() {
       try {
-        setLoading(true);
+        const promises = [];
         
-        // Fetch incidents & beats data
-        const [incidentsData, beatsData] = await Promise.all([
-          incidentsService.getAllIncidents(),
-          beatsService.getAllBeats()
-        ]);
+        // Get all beats data
+        promises.push(beatsService.getBeats());
         
-        // Process data for incidents by beat
-        const beatIncidents = processIncidentsByBeat(incidentsData, beatsData);
-        setIncidentsByBeat(beatIncidents);
+        // Get all incidents data
+        promises.push(incidentsService.getIncidents());
         
-        // Process data for incidents by type
-        const typeIncidents = processIncidentsByType(incidentsData);
-        setIncidentsByType(typeIncidents);
+        const [beatsData, incidentsData] = await Promise.all(promises);
         
-        setError(null);
+        // Process data for charts
+        setIncidentsByBeat(processIncidentsByBeat(incidentsData, beatsData));
+        setIncidentsByType(processIncidentsByType(incidentsData));
+        
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching analytics data:", error);
-        setError("Failed to load analytics data. Please try again.");
-      } finally {
+        setError("Failed to load analytics data");
         setLoading(false);
       }
     }
@@ -57,27 +56,25 @@ export default function AnalyticsPage() {
   const processIncidentsByBeat = (incidents = [], beats = []) => {
     // Since we don't have actual data, we'll create sample data
     // In a real app, you would process the actual incidents & beats data
-    
-    // Mock data for demo - replace with real data processing
     return [
       { name: 'Beat-001', incidents: 65 },
       { name: 'Beat-002', incidents: 42 },
-      { name: 'Beat-003', incidents: 73 },
-      { name: 'Beat-004', incidents: 29 },
-      { name: 'Beat-005', incidents: 51 },
-      { name: 'Beat-006', incidents: 37 },
+      { name: 'Beat-003', incidents: 28 },
+      { name: 'Beat-004', incidents: 53 },
+      { name: 'Beat-005', incidents: 37 },
+      { name: 'Beat-006', incidents: 45 }
     ];
   };
   
   // Process incidents by type for the pie chart
   const processIncidentsByType = (incidents = []) => {
-    // Mock data for demo - replace with real data processing
+    // Mock data for the pie chart
     return [
-      { name: 'Theft', value: 35 },
-      { name: 'Assault', value: 20 },
-      { name: 'Burglary', value: 15 },
-      { name: 'Disturbance', value: 25 },
-      { name: 'Traffic', value: 18 },
+      { name: 'Assault', value: 35 },
+      { name: 'Theft', value: 40 },
+      { name: 'Vandalism', value: 20 },
+      { name: 'Traffic', value: 25 },
+      { name: 'Noise', value: 15 },
       { name: 'Other', value: 12 },
     ];
   };
@@ -119,36 +116,52 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
       {/* Page header */}
-      <div>
+      <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold">Crime Analytics Dashboard</h1>
         <p className="text-muted-foreground mt-1">
           Visual insights into crime patterns and beat performance
         </p>
-      </div>
+      </motion.div>
       
       {/* Date range selector (placeholder) */}
-      <div className="card p-4">
+      <motion.div 
+        variants={itemVariants}
+        className="bg-white dark:bg-dark-500 p-4 rounded-xl shadow-md"
+      >
         <div className="flex flex-wrap gap-4 items-center">
           <span className="text-sm font-medium">Time period:</span>
-          <select className="input">
+          <select className="px-3 py-2 bg-gray-50 dark:bg-dark-400 border border-gray-200 dark:border-gray-700 rounded-lg">
             <option>Last 7 days</option>
             <option>Last 30 days</option>
             <option>Last 3 months</option>
             <option>Last 12 months</option>
             <option>Custom range</option>
           </select>
+          
           <span className="text-sm text-muted-foreground ml-auto">
-            Data updated: Apr 28, 2025
+            Data updated: Apr 29, 2025
           </span>
         </div>
-      </div>
+      </motion.div>
       
       {/* Charts grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar chart card */}
-        <div className="card p-4">
+        <motion.div 
+          variants={itemVariants}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="bg-white dark:bg-dark-500 p-4 rounded-xl shadow-md"
+        >
           <h2 className="text-lg font-medium mb-4">Incidents per Beat</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -172,10 +185,17 @@ export default function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
         
         {/* Pie chart card */}
-        <div className="card p-4">
+        <motion.div 
+          variants={itemVariants}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="bg-white dark:bg-dark-500 p-4 rounded-xl shadow-md"
+        >
           <h2 className="text-lg font-medium mb-4">Incidents by Type</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -199,52 +219,94 @@ export default function AnalyticsPage() {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </div>
-        
-        {/* Additional stats cards */}
-        <div className="card p-4">
-          <h2 className="text-lg font-medium mb-4">Response Time Metrics</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 bg-secondary rounded-lg text-center">
-              <p className="text-sm text-muted-foreground">Avg. Response Time</p>
-              <p className="text-2xl font-bold">8.5 min</p>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg text-center">
-              <p className="text-sm text-muted-foreground">Fastest Beat</p>
-              <p className="text-2xl font-bold">Beat-003</p>
-              <p className="text-xs text-muted-foreground">6.2 min avg</p>
-            </div>
-            <div className="p-4 bg-secondary rounded-lg text-center">
-              <p className="text-sm text-muted-foreground">Slowest Beat</p>
-              <p className="text-2xl font-bold">Beat-005</p>
-              <p className="text-xs text-muted-foreground">12.4 min avg</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Crime trends card */}
-        <div className="card p-4">
-          <h2 className="text-lg font-medium mb-4">Crime Trend Insights</h2>
-          <ul className="space-y-3">
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-green-100 text-green-800 rounded mr-3">↓</span>
-              <span>Theft incidents have decreased by 12% in Beat-002 since last month</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-red-100 text-red-800 rounded mr-3">↑</span>
-              <span>Assaults have increased by 8% in Beat-001 and Beat-006</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-amber-100 text-amber-800 rounded mr-3">⚠</span>
-              <span>Beat-004 shows emerging pattern of nighttime disturbances</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-blue-100 text-blue-800 rounded mr-3">ℹ</span>
-              <span>Traffic incidents are most common on Fridays between 4-6 PM</span>
-            </li>
-          </ul>
-        </div>
+        </motion.div>
       </div>
-    </div>
+      
+      {/* Additional stats cards */}
+      <motion.div 
+        variants={itemVariants}
+        className="bg-white dark:bg-dark-500 p-4 rounded-xl shadow-md"
+      >
+        <h2 className="text-lg font-medium mb-4">Response Time Metrics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <motion.div 
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            className="p-4 bg-gray-50 dark:bg-dark-400 rounded-lg text-center"
+          >
+            <p className="text-sm text-muted-foreground">Avg. Response Time</p>
+            <p className="text-2xl font-bold">8.5 min</p>
+          </motion.div>
+          <motion.div 
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            className="p-4 bg-gray-50 dark:bg-dark-400 rounded-lg text-center"
+          >
+            <p className="text-sm text-muted-foreground">Fastest Beat</p>
+            <p className="text-2xl font-bold">Beat-003</p>
+            <p className="text-xs text-muted-foreground">6.2 min avg</p>
+          </motion.div>
+          <motion.div 
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            className="p-4 bg-gray-50 dark:bg-dark-400 rounded-lg text-center"
+          >
+            <p className="text-sm text-muted-foreground">Slowest Beat</p>
+            <p className="text-2xl font-bold">Beat-005</p>
+            <p className="text-xs text-muted-foreground">12.4 min avg</p>
+          </motion.div>
+        </div>
+      </motion.div>
+      
+      {/* Crime trends card */}
+      <motion.div 
+        variants={itemVariants}
+        className="bg-white dark:bg-dark-500 p-4 rounded-xl shadow-md"
+      >
+        <h2 className="text-lg font-medium mb-4">Crime Trend Insights</h2>
+        <ul className="space-y-3">
+          <motion.li 
+            variants={itemVariants}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-start"
+          >
+            <span className="inline-block p-1 bg-green-100 text-green-800 rounded mr-3">↓</span>
+            <span>Theft incidents have decreased by 12% in Beat-002 since last month</span>
+          </motion.li>
+          <motion.li 
+            variants={itemVariants}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex items-start"
+          >
+            <span className="inline-block p-1 bg-red-100 text-red-800 rounded mr-3">↑</span>
+            <span>Assaults have increased by 8% in Beat-001 and Beat-006</span>
+          </motion.li>
+          <motion.li 
+            variants={itemVariants}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex items-start"
+          >
+            <span className="inline-block p-1 bg-amber-100 text-amber-800 rounded mr-3">⚠</span>
+            <span>Beat-004 shows emerging pattern of nighttime disturbances</span>
+          </motion.li>
+          <motion.li 
+            variants={itemVariants}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-start"
+          >
+            <span className="inline-block p-1 bg-blue-100 text-blue-800 rounded mr-3">ℹ</span>
+            <span>Overall crime rate is down 5% compared to previous quarter</span>
+          </motion.li>
+        </ul>
+      </motion.div>
+    </motion.div>
   );
 }
