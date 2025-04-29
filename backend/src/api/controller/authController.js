@@ -22,30 +22,60 @@ exports.login = async (req, res) => {
 
 
 exports.signup = async (req, res) => {
-  const { email, password, name, role } = req.body;
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ message: 'User already exists' });
-  }
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({
-    email,
-    password: hashedPassword,
-    name,
-    role, // Role should be set (e.g., "SHO", "Constable")
-  });
+  const usersData = Array.isArray(req.body) ? req.body : [req.body];
+  const createdUsers = [];
+  const errors = [];
 
-  try {
-    // Save the new user
-    await newUser.save();
-    const userData = { id: newUser._id, role: newUser.role };
-    const token = await generateJwt.generateToken(userData);
+  for (const userData of usersData) {
+    const { email, password, name, role,station_id,phone } = userData;
 
-    const userResponse = newUser.toObject();
-    delete userResponse.password;
-    res.status(201).json({ token, user: userResponse });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error creating user' });
+    try {
+      // Check if user already exists
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        errors.push({ email, message: 'User already exists' });
+        continue; // Skip this user and continue with the next one
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new user
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        name,
+        phone,
+        role, // Role should be set (e.g., "SHO", "CONSTABLE")
+        station_id
+      });
+
+      // Save the user to the database
+      await newUser.save();
+
+      const userDataToReturn = { id: newUser._id, role: newUser.role };
+      const token = await generateJwt.generateToken(userDataToReturn);
+
+      const userResponse = newUser.toObject();
+      delete userResponse.password;
+
+      createdUsers.push({ user: userResponse, token });
+    } catch (error) {
+      console.error(error);
+      errors.push({ email, message: 'Error creating user' });
+    }
   }
+
+  // If we have any successful user creations, return them
+  if (createdUsers.length > 0) {
+    return res.status(201).json({ users: createdUsers });
+  }
+
+  // If no users were created, return the errors
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  // Fallback if no data was processed
+  res.status(500).json({ message: 'No users processed' });
 };

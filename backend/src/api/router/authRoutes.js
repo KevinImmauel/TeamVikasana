@@ -9,6 +9,6 @@ const router = express.Router();
 router.post('/auth/login', login);
 
 // Signup Route
-router.post('/auth/signup', apiValidator, adminMiddleware, signup);
+router.post('/auth/signup',signup);
 
 module.exports = router;

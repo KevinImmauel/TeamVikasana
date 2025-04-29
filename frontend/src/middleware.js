@@ -14,6 +14,10 @@ export function middleware(req) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
+    if (token && pathname === '/') {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
     return NextResponse.next();
 }
 

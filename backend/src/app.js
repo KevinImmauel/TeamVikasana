@@ -12,10 +12,13 @@ const userInfo = require('./api/router/userDataRoutes.js')
 const sosRoutes = require('./api/router/sosRoutes')
 const beatRoute = require('./api/router/beatRoutes')
 const incidentRoute = require('./api/router/incidentRoutes')
+const areaRoutes = require('./api/router/areaRoutes.js')
 const statsRoute = require('./api/router/getCount.js')
+const analyticRoute = require('./analytics/analyticRoute.js')
+const getCrimeLocation = require('./api/router/crimeLocationRoutes.js')
 const chatBotRoute = require('./chatbot/chatbotRoute.js')
 const apiValidator = require('./service/validation/apiValidation.js')
-
+const path = require("path");
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -32,6 +35,8 @@ const corsOptions = {
 app.use(cors(corsOptions))
 // Middleware
 app.use(express.urlencoded({ extended: true })) // Parses incoming URL-encoded data
+app.use("./uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use(express.json())
 app.use(helmet())
 app.use(limiter)
@@ -40,7 +45,7 @@ app.use(limiter)
 // API ENtry Point
 // app.use('api/v1/')
 app.get('/',(req,res)=>{
-     res.send("You won;t be able to access any api after that")
+     res.send("You won't be able to access any api after that")
     })
 app.use('/api/v1', authRoutes)
 app.use('/api/v1', userInfo )
@@ -49,6 +54,9 @@ app.use('/api/v1/beat', beatRoute   )
 app.use('/api/v1', incidentRoute   )
 app.use('/api/v1', statsRoute   )
 app.use('/api/v1', chatBotRoute   )
+app.use('/api/v1', getCrimeLocation )
+app.use('/api/v1', analyticRoute )
+app.use('/api/v1/manage/area/', areaRoutes   )
 
 // 404 Handler
 app.use((req, _, next) => {

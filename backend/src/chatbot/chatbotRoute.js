@@ -3,35 +3,39 @@ const { getData } = require('./fetchData');
 const express = require('express');
 const router = express.Router();
 
-const cachedData = getData();
-
 router.post('/chat', async (req, res) => {
     try {
         const userMessage = req.body.message;
 
-        console.log(req.body.message)
+        // Fetch data by calling the function in fetchData module
+        const { incidents, sos, stations } = await getData();
+
+        // Check if any of the data is missing and handle accordingly
+        if (!incidents || !sos || !stations) {
+            return res.status(404).json({ error: 'Data not available.' });
+        }
 
         const prompt = `
-You are a Police Beat Management Assistant AI.
+You are a Police Station Analytics Assistant AI.
 User asked: "${userMessage}".
 
 Here is the available data:
 
-Beats:
-${JSON.stringify(cachedData.beats)}
+Stations:
+${JSON.stringify(stations, null, 2)}
 
 Incidents:
-${JSON.stringify(cachedData.incidents)}
+${JSON.stringify(incidents, null, 2)}
 
 SOS alerts:
-${JSON.stringify(cachedData.sos)}
+${JSON.stringify(sos, null, 2)}
 
 Use only the available data to answer questions.
 If information is missing, politely say "Data not available."
 `;
 
+        // Send the prompt to Gemini for generating the response
         const reply = await chatWithGemini(prompt);
-        console.log(reply)
         res.json({ reply });
     } catch (error) {
         console.error('Error chatting with Gemini:', error);

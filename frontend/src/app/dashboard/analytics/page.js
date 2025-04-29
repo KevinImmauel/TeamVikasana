@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  BarChart, Bar, 
+import {
+  BarChart, Bar,
   PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, 
-  Tooltip, Legend, ResponsiveContainer 
+  XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../../../components/LoadingSpinner";
+import api from "@/utils/axiosInstance";
 
 export default function AnalyticsPage() {
   const { hasRole } = useAuth();
@@ -16,40 +17,44 @@ export default function AnalyticsPage() {
   const [error, setError] = useState(null);
   const [incidentsByBeat, setIncidentsByBeat] = useState([]);
   const [incidentsByType, setIncidentsByType] = useState([]);
+  const [crimeTrends, setCrimeTrends] = useState([]);
+
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+
+  const formatText = (text) => {
+    return { __html: text.replace(/\n/g, '<br />').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') };
+  };
 
   useEffect(() => {
     async function fetchAnalyticsData() {
       try {
         setLoading(true);
 
-        // Static mock data
-        const incidentsData = [
-          { id: 1, type: 'Theft', beatId: 'Beat-001' },
-          { id: 2, type: 'Assault', beatId: 'Beat-002' },
-          { id: 3, type: 'Theft', beatId: 'Beat-003' },
-          { id: 4, type: 'Burglary', beatId: 'Beat-001' },
-          { id: 5, type: 'Disturbance', beatId: 'Beat-004' },
-          { id: 6, type: 'Traffic', beatId: 'Beat-005' },
-          { id: 7, type: 'Assault', beatId: 'Beat-006' },
-          // Add more incidents if needed
-        ];
-
+        const beatRes = await api.get('/crime/analysis/station');
         const beatsData = [
-          { id: 'Beat-001', name: 'Beat-001' },
-          { id: 'Beat-002', name: 'Beat-002' },
-          { id: 'Beat-003', name: 'Beat-003' },
-          { id: 'Beat-004', name: 'Beat-004' },
-          { id: 'Beat-005', name: 'Beat-005' },
-          { id: 'Beat-006', name: 'Beat-006' },
+          { id: 'STN001', name: 'Beat-001' },
+          { id: 'STN002', name: 'Beat-002' },
+          { id: 'STN003', name: 'Beat-003' },
+          { id: 'STN004', name: 'Beat-004' },
+          { id: 'STN005', name: 'Beat-005' },
+          { id: 'STN006', name: 'Beat-006' },
+          { id: 'STN007', name: 'Beat-007' },
         ];
 
-        const beatIncidents = processIncidentsByBeat(incidentsData, beatsData);
+        const beatIncidents = processIncidentsByBeat(beatRes.data, beatsData);
+        console.log("Beat incidents:", beatIncidents);
         setIncidentsByBeat(beatIncidents);
 
-        const typeIncidents = processIncidentsByType(incidentsData);
+        const stationRes = await api.get('/crime/analysis');
+        console.log("Station data:", stationRes.data);
+
+        const typeIncidents = processIncidentsByType(stationRes.data);
         setIncidentsByType(typeIncidents);
+
+        const trendsRes = await api.get('/crime-trends');
+        setCrimeTrends(trendsRes.data || []);
+
 
         setError(null);
       } catch (error) {
@@ -64,29 +69,33 @@ export default function AnalyticsPage() {
   }, []);
 
 
-  const processIncidentsByBeat = (incidents = [], beats = []) => {
-    
-    return [
-      { name: 'Beat-001', incidents: 65 },
-      { name: 'Beat-002', incidents: 42 },
-      { name: 'Beat-003', incidents: 73 },
-      { name: 'Beat-004', incidents: 29 },
-      { name: 'Beat-005', incidents: 51 },
-      { name: 'Beat-006', incidents: 37 },
-    ];
+
+  const processIncidentsByBeat = (apiData = [], beats = []) => {
+    return beats.map(beat => {
+      const beatData = apiData.find(entry => entry.station_id === beat.id);
+      const totalIncidents = beatData
+        ? beatData.incidents.reduce((sum, inc) => sum + inc.count, 0)
+        : 0;
+      return {
+        name: beat.name,
+        incidents: totalIncidents
+      };
+    });
   };
-  
-  const processIncidentsByType = (incidents = []) => {
-    return [
-      { name: 'Theft', value: 35 },
-      { name: 'Assault', value: 20 },
-      { name: 'Burglary', value: 15 },
-      { name: 'Disturbance', value: 25 },
-      { name: 'Traffic', value: 18 },
-      { name: 'Other', value: 12 },
-    ];
+
+
+
+  const processIncidentsByType = (data = []) => {
+    const total = data.reduce((sum, item) => sum + item.count, 0);
+
+    return data.map(item => ({
+      name: item.incident_type || 'null',
+      value: Number(((item.count / total) * 100).toFixed(2)),
+    }));
   };
-  
+
+
+
   // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -113,8 +122,8 @@ export default function AnalyticsPage() {
       <div className="bg-destructive/10 border border-destructive p-6 rounded-lg">
         <h2 className="text-lg font-medium text-destructive mb-2">Error</h2>
         <p>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="mt-4 btn-secondary"
         >
           Retry
@@ -146,7 +155,7 @@ export default function AnalyticsPage() {
           </span>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Incidents per Beat</h2>
@@ -157,13 +166,13 @@ export default function AnalyticsPage() {
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   tick={{ fill: 'var(--foreground)' }}
                   axisLine={{ stroke: 'var(--border)' }}
                 />
                 <YAxis
-                  tick={{ fill: 'var(--foreground)' }} 
+                  tick={{ fill: 'var(--foreground)' }}
                   axisLine={{ stroke: 'var(--border)' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
@@ -173,7 +182,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
         </div>
-        
+
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Incidents by Type</h2>
           <div className="h-80">
@@ -199,7 +208,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
         </div>
-        
+
         {/* Additional stats cards */}
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Response Time Metrics</h2>
@@ -220,29 +229,17 @@ export default function AnalyticsPage() {
             </div>
           </div>
         </div>
-        
-        <div className="card p-4">
-          <h2 className="text-lg font-medium mb-4">Crime Trend Insights</h2>
-          <ul className="space-y-3">
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-green-100 text-green-800 rounded mr-3">↓</span>
-              <span>Theft incidents have decreased by 12% in Beat-002 since last month</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-red-100 text-red-800 rounded mr-3">↑</span>
-              <span>Assaults have increased by 8% in Beat-001 and Beat-006</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-amber-100 text-amber-800 rounded mr-3">⚠</span>
-              <span>Beat-004 shows emerging pattern of nighttime disturbances</span>
-            </li>
-            <li className="flex items-start">
-              <span className="inline-block p-1 bg-blue-100 text-blue-800 rounded mr-3">ℹ</span>
-              <span>Traffic incidents are most common on Fridays between 4-6 PM</span>
-            </li>
-          </ul>
+
+        <div className="card p-4 rounded-2xl border border-gray-200 shadow-sm max-h-[400px] overflow-y-auto hover:scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400 scrollbar-track-gray-100 transition-all duration-200">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Crime Trend Insights</h2>
+          <div
+            className="prose prose-sm text-gray-700 leading-relaxed space-y-3"
+            dangerouslySetInnerHTML={formatText(crimeTrends.reply)}
+          />
         </div>
+
       </div>
+
     </div>
   );
 }

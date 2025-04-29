@@ -10,7 +10,7 @@ const BeatSchema = new Schema({
   area_covered: [String],
   start_time: Date,
   end_time: Date,
-  priority_level: String,
+  priority_level: {String , enum: ['HIGH', 'LOW', 'MEDIUM']}, 
   special_instructions: String,
   status: { type: String, default: 'Assigned' }
 }, { timestamps: true });

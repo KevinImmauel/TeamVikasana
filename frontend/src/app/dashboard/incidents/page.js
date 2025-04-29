@@ -14,9 +14,10 @@ export default function IncidentsManagement() {
   const [userLocation, setUserLocation] = useState("");
   const [loc, setLoc] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [incidentType, setIncidentType] = useState("Other"); 
 
-
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
 
   useEffect(() => {
     async function fetchIncidents() {
@@ -35,6 +36,7 @@ export default function IncidentsManagement() {
 
     fetchIncidents();
   }, []);
+
   const getUserLocation = () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -78,8 +80,6 @@ export default function IncidentsManagement() {
     fetchUserLocation();
   };
 
-
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -90,7 +90,7 @@ export default function IncidentsManagement() {
 
     const incidentData = {
       incident_type: formData.get("incident_type"),
-      location:loc,
+      location: loc,
       description: formData.get("description"),
       attachments: formData.get("attachments"),
     };
@@ -98,14 +98,17 @@ export default function IncidentsManagement() {
 
     try {
       const newIncident = await api.post("/incident/", incidentData);
-
       setIncidents((prevIncidents) => [newIncident, ...prevIncidents]);
-      console.log(incidents)
       handleCloseModal();
     } catch (error) {
       console.error("Error submitting incident:", error);
       setError("Failed to report incident. Please try again.");
     }
+  };
+
+  // Handle opening image in modal
+  const handleViewImage = (imagePath) => {
+    setImageUrl(imagePath);
   };
 
   if (loading) {
@@ -150,17 +153,24 @@ export default function IncidentsManagement() {
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">🚨 Report a New Incident</h2>
 
             <form onSubmit={handleSubmitIncident} className="space-y-6">
-
-              {/* Incident Type */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Incident Type</label>
-                <input
-                  type="text"
+                <select
                   name="incident_type"
                   className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={incidentType || "Other"} // Set default to "Other"
+                  onChange={(e) => setIncidentType(e.target.value)} // Handle state change
                   required
-                />
+                >
+                  <option value="Traffic">Traffic</option>
+                  <option value="Theft">Theft</option>
+                  <option value="Assault">Assault</option>
+                  <option value="Burglary">Burglary</option>
+                  <option value="Disturbance">Disturbance</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
+
 
               {/* Location */}
               <div className="space-y-2">
@@ -223,7 +233,6 @@ export default function IncidentsManagement() {
             </form>
           </div>
         </div>
-
       )}
 
       {incidents.length === 0 ? (
@@ -299,6 +308,15 @@ export default function IncidentsManagement() {
                     {(hasRole("SuperAdmin") || hasRole("SHO")) && (
                       <button className="text-primary hover:underline">Update</button>
                     )}
+                    {/* Open image view if available */}
+                    {incident.attachments && incident.attachments.length > 0 && (
+                      <button
+                        onClick={() => handleViewImage(incident.attachments[0].url)}
+                        className="text-primary hover:underline ml-2"
+                      >
+                        View Image
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -306,14 +324,26 @@ export default function IncidentsManagement() {
           </table>
         </div>
       )}
+
+      {imageUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg">
+            <img src={imageUrl} alt="Incident Attachment" className="w-full h-auto" />
+            <button
+              onClick={() => setImageUrl("")}
+              className="mt-4 px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <UserInfoModal
         userId={selectedUserId}
         isOpen={!!selectedUserId}
         onClose={() => setSelectedUserId(null)}
       />
-
     </div>
-
-    
   );
 }
