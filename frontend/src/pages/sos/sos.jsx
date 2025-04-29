@@ -31,7 +31,7 @@ const SOSPage = () => {
         socketConnection.on("newSOS", (data) => {
             console.log("Received SOS:", data);
             setLiveSOSMessages((prev) => [data, ...prev]);
-            toast.info("🚨 New SOS received!");
+            toast.info(" New SOS received!");
 
             if (audioRef.current) {
                 audioRef.current.play();
@@ -107,7 +107,7 @@ const SOSPage = () => {
 
             const token = getToken();
             socket.emit("sendSOS", sosData, token);
-            toast.success("✅ SOS message sent!");
+            toast.success("SOS message sent!");
         } else {
             toast.error("❌ Socket connection lost. Please try again.");
         }
@@ -156,7 +156,7 @@ const SOSPage = () => {
             <audio ref={audioRef} src="/sounds/e1.mp3" preload="auto" />
 
             <div className="bg-white rounded-3xl  p-10  w-full space-y-8">
-                <h1 className="text-4xl font-extrabold text-center text-blue-700 mb-4">🚨 SOS Dashboard</h1>
+                <h1 className="text-4xl font-extrabold text-center text-blue-700 mb-4">SOS Dashboard</h1>
 
                 <p className="text-center text-lg text-gray-700 mb-6">
                     Connection Status: <span className={`font-semibold ${status === "Connected" ? "text-green-600" : "text-red-600"}`}>{status}</span>
@@ -174,7 +174,7 @@ const SOSPage = () => {
                         onClick={sendSOS}
                         className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition"
                     >
-                        🚀 Send SOS
+                        Send SOS
                     </button>
                 </div>
 
@@ -184,7 +184,7 @@ const SOSPage = () => {
                         disabled={loadingPrevious}
                         className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition"
                     >
-                        {loadingPrevious ? "Loading..." : "📜 Load Previous SOS"}
+                        {loadingPrevious ? "Loading..." : " Load Previous SOS"}
                     </button>
 
                     {isSoundPlaying && (
@@ -198,7 +198,7 @@ const SOSPage = () => {
                 </div>
 
                 <section>
-                    <h2 className="text-3xl font-semibold mb-6 text-center text-blue-800">⚡ Live SOS Updates</h2>
+                    <h2 className="text-3xl font-semibold mb-6 text-center text-blue-800">Live SOS Updates</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {liveSOSMessages.length === 0 ? (
                             <p className="text-center text-gray-500 col-span-2">No live SOS received yet.</p>
@@ -211,7 +211,7 @@ const SOSPage = () => {
                 </section>
 
                 <section className="pt-10">
-                    <h2 className="text-3xl font-semibold mb-6 text-center text-green-700">📜 Previous SOS Messages</h2>
+                    <h2 className="text-3xl font-semibold mb-6 text-center text-green-700"> Previous SOS Messages</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {previousSOSMessages.length === 0 ? (
                             <p className="text-center text-gray-500 col-span-2">No previous SOS messages found.</p>

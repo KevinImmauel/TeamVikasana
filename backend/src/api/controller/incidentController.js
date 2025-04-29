@@ -14,7 +14,7 @@ exports.reportIncident = async (req, res) => {
     attachments,
     reported_at: new Date()
   });
-  console.log(incident);
+  console.log(incident)
   await incident.save();
   res.json({ message: 'Incident reported successfully', incident });
 };

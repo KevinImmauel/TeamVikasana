@@ -64,10 +64,8 @@ export default function AnalyticsPage() {
   }, []);
 
 
-  // Process incidents by beat for the bar chart
   const processIncidentsByBeat = (incidents = [], beats = []) => {
     
-    // Mock data for demo - replace with real data processing
     return [
       { name: 'Beat-001', incidents: 65 },
       { name: 'Beat-002', incidents: 42 },
@@ -78,9 +76,7 @@ export default function AnalyticsPage() {
     ];
   };
   
-  // Process incidents by type for the pie chart
   const processIncidentsByType = (incidents = []) => {
-    // Mock data for demo - replace with real data processing
     return [
       { name: 'Theft', value: 35 },
       { name: 'Assault', value: 20 },
@@ -129,15 +125,12 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 mt-10">
-      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold">Crime Analytics Dashboard</h1>
         <p className="text-muted-foreground mt-1">
           Visual insights into crime patterns and beat performance
         </p>
       </div>
-      
-      {/* Date range selector (placeholder) */}
       <div className="card p-4">
         <div className="flex flex-wrap gap-4 items-center">
           <span className="text-sm font-medium">Time period:</span>
@@ -154,9 +147,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
       
-      {/* Charts grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bar chart card */}
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Incidents per Beat</h2>
           <div className="h-80">
@@ -183,7 +174,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
         
-        {/* Pie chart card */}
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Incidents by Type</h2>
           <div className="h-80">
@@ -231,7 +221,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
         
-        {/* Crime trends card */}
         <div className="card p-4">
           <h2 className="text-lg font-medium mb-4">Crime Trend Insights</h2>
           <ul className="space-y-3">

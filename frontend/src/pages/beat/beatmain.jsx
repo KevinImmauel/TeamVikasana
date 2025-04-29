@@ -135,24 +135,6 @@ export default function BeatsPage() {
                                 className="w-full border p-3 rounded-xl"
                                 required
                             />
-                           {/*  <div className="flex gap-4">
-                                <input
-                                    type="time"
-                                    name="start_time"
-                                    value={formData.start_time}
-                                    onChange={handleChange}
-                                    className="w-full border p-3 rounded-xl"
-                                    required
-                                />
-                                <input
-                                    type="time"
-                                    name="end_time"
-                                    value={formData.end_time}
-                                    onChange={handleChange}
-                                    className="w-full border p-3 rounded-xl"
-                                    required
-                                />
-                            </div> */}
                             <input
                                 type="text"
                                 name="priority_level"

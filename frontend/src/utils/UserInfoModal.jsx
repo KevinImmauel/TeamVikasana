@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import api from "@/utils/axiosInstance";
-import { Loader2 } from "lucide-react"; // optional: for modern loading icon
+import { Loader2 } from "lucide-react"; 
 
 export default function UserInfoModal({ userId, isOpen, onClose }) {
     const [user, setUser] = useState(null);

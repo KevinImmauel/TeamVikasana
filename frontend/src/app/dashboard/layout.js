@@ -11,12 +11,9 @@ export default function DashboardLayout({ children }) {
   return (
     <ErrorBoundary>
         <div className={`flex h-screen ${isDark ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-          {/* Sidebar */}
           <Sidebar />
           
-          {/* Main content */}
           <div className="flex flex-col flex-1 overflow-hidden">
-            {/* Top navigation */}
             <Navbar />
             
             {/* Page content */}
