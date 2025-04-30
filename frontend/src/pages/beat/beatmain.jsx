@@ -169,7 +169,7 @@ export default function BeatsPage() {
                                 <option value="">Select User</option>
                                 {filteredUsers?.map(user => (
                                     <option key={user.id} value={user.id}>
-                                        {user.name} ({user.stationId})
+                                        {user.name} ({user.stationId}) ({user.rank})
                                     </option>
                                 ))}
                             </select>

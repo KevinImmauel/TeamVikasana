@@ -34,8 +34,18 @@ const setupSocket = (server) => {
                 sosData.triggered_by = userId;
 
                 // Save SOS data to MongoDB
-                const sosMessage = new SOS(sosData);
+                console.log(sosData);
                 const getStation = await user.findOne({ _id: userId });
+                const data = {
+                    triggered_by: sosData.triggered_by,
+                    station_id: getStation.station_id,
+                    location:{
+                        latitude: sosData.location.latitude, longitude: sosData.location.longitude
+                    },
+                    emergency_type: sosData.emergency_type
+                }
+                const sosMessage = new SOS(data);
+                
                 if (getStation && getStation.station_id) {
                     sosData.station_id = getStation.station_id;
                 }
