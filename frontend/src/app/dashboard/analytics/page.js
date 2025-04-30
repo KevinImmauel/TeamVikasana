@@ -18,6 +18,9 @@ export default function AnalyticsPage() {
   const [incidentsByBeat, setIncidentsByBeat] = useState([]);
   const [incidentsByType, setIncidentsByType] = useState([]);
   const [crimeTrends, setCrimeTrends] = useState([]);
+  const [hasFetched, setHasFetched] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
 
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
@@ -27,46 +30,72 @@ export default function AnalyticsPage() {
   };
 
   useEffect(() => {
-    async function fetchAnalyticsData() {
+    const cached = localStorage.getItem("analytics-data");
+    if (cached) {
       try {
-        setLoading(true);
-
-        const beatRes = await api.get('/crime/analysis/station');
-        const beatsData = [
-          { id: 'STN001', name: 'Beat-001' },
-          { id: 'STN002', name: 'Beat-002' },
-          { id: 'STN003', name: 'Beat-003' },
-          { id: 'STN004', name: 'Beat-004' },
-          { id: 'STN005', name: 'Beat-005' },
-          { id: 'STN006', name: 'Beat-006' },
-          { id: 'STN007', name: 'Beat-007' },
-        ];
-
-        const beatIncidents = processIncidentsByBeat(beatRes.data, beatsData);
-        console.log("Beat incidents:", beatIncidents);
-        setIncidentsByBeat(beatIncidents);
-
-        const stationRes = await api.get('/crime/analysis');
-        console.log("Station data:", stationRes.data);
-
-        const typeIncidents = processIncidentsByType(stationRes.data);
-        setIncidentsByType(typeIncidents);
-
-        const trendsRes = await api.get('/crime-trends');
-        setCrimeTrends(trendsRes.data || []);
-
-
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching analytics data:", error);
-        setError("Failed to load analytics data. Please try again.");
-      } finally {
+        const parsed = JSON.parse(cached);
+        setIncidentsByBeat(parsed.incidentsByBeat || []);
+        setIncidentsByType(parsed.incidentsByType || []);
+        setCrimeTrends(parsed.crimeTrends || []);
+        setLastUpdated(parsed.lastUpdated || null);
+        setHasFetched(true);
         setLoading(false);
+      } catch (err) {
+        console.error("Error parsing cached analytics data:", err);
+        handleRefresh(); // fallback to fresh fetch if parsing fails
       }
+    } else {
+      handleRefresh(); // fetch if nothing in localStorage
     }
-
-    fetchAnalyticsData();
   }, []);
+
+
+
+
+  const handleRefresh = async () => {
+    try {
+      setLoading(true);
+      const beatRes = await api.get('/crime/analysis/station');
+      const stationRes = await api.get('/crime/analysis');
+      const trendsRes = await api.get('/crime-trends');
+
+      const beatsData = [
+        { id: 'STN001', name: 'Beat-001' },
+        { id: 'STN002', name: 'Beat-002' },
+        { id: 'STN003', name: 'Beat-003' },
+        { id: 'STN004', name: 'Beat-004' },
+        { id: 'STN005', name: 'Beat-005' },
+        { id: 'STN006', name: 'Beat-006' },
+        { id: 'STN007', name: 'Beat-007' },
+      ];
+
+      const beatIncidents = processIncidentsByBeat(beatRes.data, beatsData);
+      const typeIncidents = processIncidentsByType(stationRes.data);
+      const trendData = trendsRes.data || [];
+      const updatedAt = new Date().toISOString();
+      setIncidentsByBeat(beatIncidents);
+      setIncidentsByType(typeIncidents);
+      setCrimeTrends(trendData);
+      setError(null);
+      setHasFetched(true);
+      setLastUpdated(updatedAt);
+      localStorage.setItem("analytics-data", JSON.stringify({
+        incidentsByBeat: beatIncidents,
+        incidentsByType: typeIncidents,
+        crimeTrends: trendData,
+        lastUpdated: updatedAt,
+      }));
+    } catch (err) {
+      console.error("Error fetching analytics data:", err);
+      setError("Failed to load analytics data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
 
 
 
@@ -134,6 +163,11 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 mt-10">
+      {/*       <div className="card p-4 flex justify-between items-center">
+
+        
+      </div>
+ */}
       <div>
         <h1 className="text-2xl font-bold">Crime Analytics Dashboard</h1>
         <p className="text-muted-foreground mt-1">
@@ -142,17 +176,21 @@ export default function AnalyticsPage() {
       </div>
       <div className="card p-4">
         <div className="flex flex-wrap gap-4 items-center">
-          <span className="text-sm font-medium">Time period:</span>
+          {/*  <span className="text-sm font-medium">Time period:</span>
           <select className="input">
             <option>Last 7 days</option>
             <option>Last 30 days</option>
             <option>Last 3 months</option>
             <option>Last 12 months</option>
             <option>Custom range</option>
-          </select>
+          </select> */}
+          <button onClick={handleRefresh} className="btn-primary">
+            🔄 Refresh Data
+          </button>
           <span className="text-sm text-muted-foreground ml-auto">
-            Data updated: Apr 28, 2025
+            {lastUpdated ? `Data updated: ${new Date(lastUpdated).toLocaleString()}` : "No recent update"}
           </span>
+
         </div>
       </div>
 
