@@ -22,17 +22,19 @@ const path = require("path");
 
 const corsOptions = {
     origin: function (origin, callback) {
-        // Check if the incoming origin is in the list of allowed origins
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true)
+        // Allow all if origin is not present (like in curl/bots), or is in the list
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'))
+            // Still allow unknown origins
+            callback(null, true); // <- Relaxed for bots and unknowns
         }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true
+    credentials: true,
 }
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
+
 // Middleware
 app.use(express.urlencoded({ extended: true })) // Parses incoming URL-encoded data
 app.use("./uploads", express.static(path.join(__dirname, "uploads")));
