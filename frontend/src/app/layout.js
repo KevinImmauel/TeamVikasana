@@ -3,6 +3,9 @@ import { AuthProvider } from "./context/AuthContext";
 import AppErrorBoundary from "../components/ErrorBoundary";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import {SocketProvider} from "../app/context/socketProvider"
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +30,18 @@ export default function RootLayout({ children }) {
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>
+      >                <SocketProvider>
+
+          <AuthProvider>
             <AppErrorBoundary>
-            <Navbar/>
+
+              <Navbar />
               {children}
+
             </AppErrorBoundary>
-        </AuthProvider>
+          </AuthProvider>
+        </SocketProvider>
+
       </body>
     </html>
   );
