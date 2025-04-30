@@ -19,7 +19,7 @@ const SOSPage = () => {
     const audioRef = useRef(null);
 
     useEffect(() => {
-        const socketConnection = io("http://localhost:9090", {
+        const socketConnection = io("https://cyber-acrt.onrender.com/", {
             transports: ["websocket"],
         });
 
