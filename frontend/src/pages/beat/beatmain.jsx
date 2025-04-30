@@ -4,10 +4,16 @@ import { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import axios from 'axios';
 import api from '@/utils/axiosInstance';
+import UserInfoModal from "@/utils/UserInfoModal";
 
 export default function BeatsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [beats, setBeats] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const getStationIdFromBeat = (beatId) => beatId;
+    
+    const beatOptions = ['STN001', 'STN002', 'STN003', 'STN004', 'STN005', 'STN006', 'STN007'];
     const [formData, setFormData] = useState({
         beat_id: '',
         assigned_to: '',
@@ -17,11 +23,16 @@ export default function BeatsPage() {
         priority_level: '',
         special_instructions: '',
     });
+    const filteredUsers = users.filter(user => user.stationId === formData.beat_id)
+    // (formData.beat_id));
+
+
 
     const fetchBeats = async () => {
         try {
             const response = await api.get('/beat/');
             setBeats(response.data);
+            console.log(response.data);
         } catch (error) {
             console.error('Failed to fetch beats:', error);
         }
@@ -30,6 +41,25 @@ export default function BeatsPage() {
     useEffect(() => {
         fetchBeats();
     }, []);
+
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await api.get('/user/all/data');
+                setUsers(response.data.users);
+                console.log(users)
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            }
+        };
+        fetchUsers();
+    }, []);
+
+
+    
+   
+
 
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -81,10 +111,17 @@ export default function BeatsPage() {
                     beats.map((beat) => (
                         <div key={beat._id} className="bg-white rounded-2xl p-6 shadow hover:shadow-lg transition">
                             <h2 className="text-xl font-semibold mb-2">Beat ID: {beat.beat_id}</h2>
+                            <button
+                                onClick={() => setSelectedUserId(beat.assigned_to)}
+                                className="text-blue-600 hover:underline"
+                            >
+                                {beat.assigned_to}
+                            </button>
                             <p className="text-gray-700"><strong>Assigned To:</strong> {beat.assigned_to}</p>
+
                             <p className="text-gray-700"><strong>Area Covered:</strong> {beat.area_covered.join(', ')}</p>
-                            <p className="text-gray-700"><strong>Priority:</strong> {beat.priority_level}</p>
-                            <p className="text-gray-700"><strong>Timing:</strong> {new Date(beat.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(beat.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p className="text-gray-700"><strong>Priority:</strong> {beat.priority_level.enum[0]}</p>
+                            <p className="text-gray-700"><strong>Timing:</strong> {new Date(beat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(beat.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                             <p className="text-gray-700"><strong>Status:</strong> {beat.status}</p>
                             <p className="text-gray-500 mt-2"><strong>Instructions:</strong> {beat.special_instructions}</p>
                         </div>
@@ -108,24 +145,35 @@ export default function BeatsPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <input
-                                type="text"
+                            <select
                                 name="beat_id"
-                                placeholder="Beat ID"
                                 value={formData.beat_id}
                                 onChange={handleChange}
                                 className="w-full border p-3 rounded-xl"
                                 required
-                            />
-                            <input
-                                type="text"
+                            >
+                                <option value="">Select Beat ID</option>
+                                {beatOptions.map(id => (
+                                    <option key={id} value={id}>{id}</option>
+                                ))}
+                            </select>
+
+                            <select
                                 name="assigned_to"
-                                placeholder="Assigned To (Constable User ID)"
                                 value={formData.assigned_to}
                                 onChange={handleChange}
                                 className="w-full border p-3 rounded-xl"
                                 required
-                            />
+                                disabled={!formData.beat_id}
+                            >
+                                <option value="">Select User</option>
+                                {filteredUsers?.map(user => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.name} ({user.stationId})
+                                    </option>
+                                ))}
+                            </select>
+
                             <input
                                 type="text"
                                 name="area_covered"
@@ -162,6 +210,11 @@ export default function BeatsPage() {
                     </Dialog.Panel>
                 </div>
             </Dialog>
+              <UserInfoModal
+                    userId={selectedUserId}
+                    isOpen={!!selectedUserId}
+                    onClose={() => setSelectedUserId(null)}
+                  />
         </div>
     );
 }
