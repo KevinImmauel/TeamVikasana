@@ -18,7 +18,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const { data } = await axios.post(
-                'http://localhost:9090/api/v1/auth/login',
+                'https://cyber-acrt.onrender.com/api/v1/auth/login',
                 form,
                 {
                     headers: { 'Content-Type': 'application/json' },
