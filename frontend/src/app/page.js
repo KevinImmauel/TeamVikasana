@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "./context/AuthContext";
 import { motion } from "framer-motion";
 
+
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, loading } = useAuth();

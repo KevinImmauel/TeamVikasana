@@ -1,107 +1,56 @@
 "use client";
-
-import { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
-import axios from "axios";
-import { toast } from "react-toastify";
-import ToastContainer from "@/utils/toastContainer";
 import api from "@/utils/axiosInstance";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { useSocket } from "@/app/context/socketProvider";
+import ToastContainer from "@/utils/toastContainer";
 import { getToken } from "@/utils/tokenHelper";
 
 const SOSPage = () => {
-    const [socket, setSocket] = useState(null);
+    const { socket, status } = useSocket();
     const [message, setMessage] = useState("");
-    const [status, setStatus] = useState("Disconnected");
     const [liveSOSMessages, setLiveSOSMessages] = useState([]);
     const [previousSOSMessages, setPreviousSOSMessages] = useState([]);
     const [loadingPrevious, setLoadingPrevious] = useState(false);
-    const [isSoundPlaying, setIsSoundPlaying] = useState(false);
-    const audioRef = useRef(null);
+    
 
     useEffect(() => {
-        const socketConnection = io("https://cyber-acrt.onrender.com/", {
-            transports: ["websocket"],
-        });
+        if (!socket) return;
 
-        socketConnection.on("connect", () => {
-            setStatus("Connected");
-            console.log("Connected to Socket.IO");
-        });
-
-        socketConnection.on("newSOS", (data) => {
+        socket.on("newSOS", (data) => {
             console.log("Received SOS:", data);
             setLiveSOSMessages((prev) => [data, ...prev]);
-            toast.info(" New SOS received!");
+            toast.info("New SOS received!");
 
-            if (audioRef.current) {
-                audioRef.current.play();
-                setIsSoundPlaying(true);
-
-                setTimeout(() => {
-                    audioRef.current.pause();
-                    audioRef.current.currentTime = 0;
-                    setIsSoundPlaying(false);
-                }, 5000);
+            // Browser notification when page is not focused
+            if (document.visibilityState === "hidden" && Notification.permission === "granted") {
+                new Notification("New SOS Alert!", {
+                    body: `Emergency Type: ${data.emergency_type}`,
+                    icon: "/favicon.ico",
+                });
             }
-        });
 
-        setSocket(socketConnection);
+            // Play sound (audio logic stays the same as before)
+            const audio = new Audio("/sounds/e1.mp3");
+            audio.play();
+            setTimeout(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }, 5000);
+        });
 
         return () => {
-            socketConnection.disconnect();
+            socket.off("newSOS");
         };
-    }, []);
+    }, [socket]);
 
-    const stopSound = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-            setIsSoundPlaying(false);
-        }
-    };
-
-
-    const getUserLocation = () => {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error("Geolocation is not supported by your browser."));
-            } else {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        resolve({
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude,
-                        });
-                    },
-                    (error) => {
-                        reject(new Error(`Geolocation error: ${error.message}`));
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0,
-                    }
-                );
-            }
-        });
-    };
-
-
-
-    const sendSOS = async() => {
+    const sendSOS = async () => {
         if (socket && socket.connected) {
             const location = await getUserLocation();
-            console.log(location);
             const sosData = {
                 triggered_by: "User1",
                 station_id: "Station1",
                 location,
-                // : {
-
-
-                //     latitude: 12.9716,
-                //     longitude: 77.5946,
-                // },
                 emergency_type: message || "Medical",
             };
 
@@ -130,22 +79,18 @@ const SOSPage = () => {
         <div className="p-4 border rounded-xl shadow-lg bg-white hover:shadow-2xl transition-all duration-300">
             <p><strong>🚨 Triggered By:</strong> {sos?.triggered_by}</p>
             <p><strong>🏢 Station:</strong> {sos?.station_id}</p>
-            <p>
-                <strong>📍 Location:</strong>{' '}
-                {sos?.location?.latitude && sos?.location?.longitude ? (
-                    <a
-                        href={`https://www.google.com/maps?q=${sos.location.latitude},${sos.location.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
-                    >
-                        ({sos.location.latitude}, {sos.location.longitude})
-                    </a>
-                ) : (
-                    'Location not available'
-                )}
-            </p>
-
+            <p><strong>📍 Location:</strong> {sos?.location?.latitude && sos?.location?.longitude ? (
+                <a
+                    href={`https://www.google.com/maps?q=${sos.location.latitude},${sos.location.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                >
+                    ({sos.location.latitude}, {sos.location.longitude})
+                </a>
+            ) : (
+                'Location not available'
+            )}</p>
             <p><strong>🆘 Emergency Type:</strong> {sos?.emergency_type}</p>
             <p><strong>⏰ Timestamp:</strong> {new Date(sos?.createdAt || sos?.timestamp).toLocaleString()}</p>
         </div>
@@ -153,11 +98,8 @@ const SOSPage = () => {
 
     return (
         <div className="min-h-screen pt-10 flex flex-col items-center">
-            <audio ref={audioRef} src="/sounds/e1.mp3" preload="auto" />
-
-            <div className="bg-white rounded-3xl  p-10  w-full space-y-8">
+            <div className="bg-white rounded-3xl p-10 w-full space-y-8">
                 <h1 className="text-4xl font-extrabold text-center text-blue-700 mb-4">SOS Dashboard</h1>
-
                 <p className="text-center text-lg text-gray-700 mb-6">
                     Connection Status: <span className={`font-semibold ${status === "Connected" ? "text-green-600" : "text-red-600"}`}>{status}</span>
                 </p>
@@ -184,17 +126,8 @@ const SOSPage = () => {
                         disabled={loadingPrevious}
                         className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition"
                     >
-                        {loadingPrevious ? "Loading..." : " Load Previous SOS"}
+                        {loadingPrevious ? "Loading..." : "Load Previous SOS"}
                     </button>
-
-                    {isSoundPlaying && (
-                        <button
-                            onClick={stopSound}
-                            className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition"
-                        >
-                            🔇 Stop Sound
-                        </button>
-                    )}
                 </div>
 
                 <section>
@@ -223,7 +156,6 @@ const SOSPage = () => {
                     </div>
                 </section>
             </div>
-
             <ToastContainer />
         </div>
     );
