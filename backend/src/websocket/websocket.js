@@ -22,19 +22,19 @@ const setupSocket = (server) => {
     });
 
     io.on('connection', (socket) => {
-        console.log('A user connected');
+        // console.log('A user connected');
         userConnections.set(socket.id, { socket });
         socket.on('sendSOS', async (sosData, token) => {
             try {
                
                 const decoded = jwt.verify(token, JWT_SECRET);
-                console.log(decoded);
+                // console.log(decoded);
                 const userId = decoded.userData.id; 
                 // logger.error(userId)
                 sosData.triggered_by = userId;
 
                 // Save SOS data to MongoDB
-                console.log(sosData);
+                // console.log(sosData);
                 const getStation = await user.findOne({ _id: userId });
                 const data = {
                     triggered_by: sosData.triggered_by,
@@ -52,7 +52,7 @@ const setupSocket = (server) => {
 
                 await sosMessage.save(); 
 
-                console.log('SOS saved to database:', sosMessage);
+                // console.log('SOS saved to database:', sosMessage);
                 logCrimeLocationAsync({
                     location:sosData.location,
                     seriousness:"HIGH",
@@ -67,7 +67,7 @@ const setupSocket = (server) => {
         });
         socket.on('disconnect', () => {
             userConnections.delete(socket.id);
-            console.log('A user disconnected');
+            // console.log('A user disconnected');
         });
     });
 

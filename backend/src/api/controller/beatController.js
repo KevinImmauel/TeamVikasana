@@ -5,7 +5,7 @@ exports.assignBeat = async (req, res) => {
   try {
     const { beat_id, assigned_to, area_covered, priority_level, special_instructions } = req.body;
     const userData = extractUserFromToken(req);
-    console.log(userData)
+    // console.log(userData)
     const beat = new Beat({
       beat_id,
       assigned_to,

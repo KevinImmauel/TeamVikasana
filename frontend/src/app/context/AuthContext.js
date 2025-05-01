@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      console.log("Using API URL:", `${apiUrl}/auth/login`);
+      // console.log("Using API URL:", `${apiUrl}/auth/login`);
 
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',

@@ -14,7 +14,7 @@ exports.reportIncident = async (req, res) => {
   const userData = extractUserFromToken(req);
 
   const getStation = await user.findOne({ _id: userData.id });
-  console.log(getStation);
+  // console.log(getStation);
 
   const incident = new Incident({
     beat_id,
@@ -48,7 +48,7 @@ exports.reportIncident = async (req, res) => {
 
 exports.getIncidents = async (req, res) => {
   const incidents = await Incident.find({});
-  console.log(incidents);
+  // console.log(incidents);
   // { station_id: req.user.station_id }
   res.json(incidents);
 };
